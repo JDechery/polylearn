@@ -161,12 +161,14 @@ def _cd_direct_ho(double[:, :, ::1] P not None,
                   LossFunction loss,
                   unsigned int max_iter,
                   double tol,
+                  double reltol,
                   int verbose):
 
     cdef Py_ssize_t n_samples = X.get_n_samples()
     cdef unsigned int it
 
     cdef double viol
+    cdef double prev_viol = 0.
     cdef bint converged = False
 
     # precomputed values
@@ -189,10 +191,11 @@ def _cd_direct_ho(double[:, :, ::1] P not None,
         if verbose:
             print("Iteration", it + 1, "violation sum", viol)
 
-        if viol < tol:
+        if (viol < tol) or (fabs(viol - prev_viol) / viol < reltol):
             if verbose:
                 print("Converged at iteration", it + 1)
             converged = True
             break
-
+        
+        prev_viol = viol
     return converged, it

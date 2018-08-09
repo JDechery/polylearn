@@ -30,7 +30,7 @@ class _BaseFactorizationMachine(six.with_metaclass(ABCMeta, _BasePoly)):
 
     @abstractmethod
     def __init__(self, degree=2, loss='squared', n_components=2, alpha=1,
-                 beta=1, tol=1e-6, fit_lower='explicit', fit_linear=True,
+                 beta=1, tol=1e-6, reltol=1e-8, fit_lower='explicit', fit_linear=True,
                  warm_start=False, init_lambdas='ones', max_iter=10000,
                  verbose=False, random_state=None):
         self.degree = degree
@@ -39,6 +39,7 @@ class _BaseFactorizationMachine(six.with_metaclass(ABCMeta, _BasePoly)):
         self.alpha = alpha
         self.beta = beta
         self.tol = tol
+        self.reltol = reltol
         self.fit_lower = fit_lower
         self.fit_linear = fit_linear
         self.warm_start = warm_start
@@ -111,7 +112,7 @@ class _BaseFactorizationMachine(six.with_metaclass(ABCMeta, _BasePoly)):
             self.P_, self.w_, dataset, X_col_norms, y, y_pred,
             self.lams_, self.degree, self.alpha, self.beta, self.fit_linear,
             self.fit_lower == 'explicit', loss_obj, self.max_iter,
-            self.tol, self.verbose)
+            self.tol, self.reltol, self.verbose)
         if not converged:
             warnings.warn("Objective did not converge. Increase max_iter.")
 
@@ -163,6 +164,9 @@ class FactorizationMachineRegressor(_BaseFactorizationMachine,
 
     tol : float, default: 1e-6
         Tolerance for the stopping condition.
+
+    reltol : float, default: 1e-8
+        Relative tolerance for the stopping condition.
 
     fit_lower : {'explicit'|'augment'|None}, default: 'explicit'
         Whether and how to fit lower-order, non-homogeneous terms.
@@ -239,12 +243,12 @@ class FactorizationMachineRegressor(_BaseFactorizationMachine,
     In: Proceedings of IEEE 2010.
     """
     def __init__(self, degree=2, n_components=2, alpha=1, beta=1, tol=1e-6,
-                 fit_lower='explicit', fit_linear=True, warm_start=False,
+                 reltol=1e-8, fit_lower='explicit', fit_linear=True, warm_start=False,
                  init_lambdas='ones', max_iter=10000, verbose=False,
                  random_state=None):
 
         super(FactorizationMachineRegressor, self).__init__(
-            degree, 'squared', n_components, alpha, beta, tol, fit_lower,
+            degree, 'squared', n_components, alpha, beta, tol, reltol, fit_lower,
             fit_linear, warm_start, init_lambdas, max_iter, verbose,
             random_state)
 
@@ -282,6 +286,9 @@ class FactorizationMachineClassifier(_BaseFactorizationMachine,
 
     tol : float, default: 1e-6
         Tolerance for the stopping condition.
+
+    reltol : floa, default: 1e-8
+        Relative tolerance for the stopping condition.
 
     fit_lower : {'explicit'|'augment'|None}, default: 'explicit'
         Whether and how to fit lower-order, non-homogeneous terms.
@@ -359,11 +366,11 @@ class FactorizationMachineClassifier(_BaseFactorizationMachine,
     """
 
     def __init__(self, degree=2, loss='squared_hinge', n_components=2, alpha=1,
-                 beta=1, tol=1e-6, fit_lower='explicit', fit_linear=True,
+                 beta=1, tol=1e-6, reltol=1e-8, fit_lower='explicit', fit_linear=True,
                  warm_start=False, init_lambdas='ones', max_iter=10000,
                  verbose=False, random_state=None):
 
         super(FactorizationMachineClassifier, self).__init__(
-            degree, loss, n_components, alpha, beta, tol, fit_lower,
+            degree, loss, n_components, alpha, beta, tol, reltol, fit_lower,
             fit_linear, warm_start, init_lambdas, max_iter, verbose,
             random_state)
