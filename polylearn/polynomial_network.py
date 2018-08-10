@@ -35,13 +35,14 @@ def _lifted_predict(U, dataset):
 class _BasePolynomialNetwork(six.with_metaclass(ABCMeta, _BasePoly)):
     @abstractmethod
     def __init__(self, degree=2, loss='squared', n_components=5, beta=1,
-                 tol=1e-6, fit_lower='augment', warm_start=False,
+                 tol=1e-6, reltol=1e-8, fit_lower='augment', warm_start=False,
                  max_iter=10000, verbose=False, random_state=None):
         self.degree = degree
         self.loss = loss
         self.n_components = n_components
         self.beta = beta
         self.tol = tol
+        self.reltol = reltol
         self.fit_lower = fit_lower
         self.warm_start = warm_start
         self.max_iter = max_iter
@@ -91,7 +92,7 @@ class _BasePolynomialNetwork(six.with_metaclass(ABCMeta, _BasePoly)):
 
         converged, self.n_iter_ = _cd_lifted(
             self.U_, dataset, y, y_pred, self.beta, loss_obj, self.max_iter,
-            self.tol, self.verbose)
+            self.tol, self.reltol, self.verbose)
 
         if not converged:
             warnings.warn("Objective did not converge. Increase max_iter.")
@@ -170,11 +171,11 @@ class PolynomialNetworkRegressor(_BasePolynomialNetwork, _PolyRegressorMixin):
     """
 
     def __init__(self, degree=2, n_components=2, beta=1, tol=1e-6,
-                 fit_lower='augment', warm_start=False,
+                 reltol=1e-8, fit_lower='augment', warm_start=False,
                  max_iter=10000, verbose=False, random_state=None):
 
         super(PolynomialNetworkRegressor, self).__init__(
-            degree, 'squared', n_components, beta, tol, fit_lower,
+            degree, 'squared', n_components, beta, tol, reltol, fit_lower,
             warm_start, max_iter, verbose, random_state)
 
 
@@ -207,6 +208,9 @@ class PolynomialNetworkClassifier(_BasePolynomialNetwork,
 
     tol : float, default: 1e-6
         Tolerance for the stopping condition.
+
+    reltol : float, default: 1e-8
+        Relative tolerance for the stopping condition.
 
     fit_lower : {'augment'|None}, default: 'augment'
         Whether and how to fit lower-order, non-homogeneous terms.
@@ -250,9 +254,9 @@ class PolynomialNetworkClassifier(_BasePolynomialNetwork,
     """
 
     def __init__(self, degree=2, loss='squared_hinge', n_components=2, beta=1,
-                 tol=1e-6, fit_lower='augment', warm_start=False,
+                 tol=1e-6, reltol=1e-8, fit_lower='augment', warm_start=False,
                  max_iter=10000, verbose=False, random_state=None):
 
         super(PolynomialNetworkClassifier, self).__init__(
-            degree, loss, n_components, beta, tol, fit_lower,
+            degree, loss, n_components, beta, tol, reltol, fit_lower,
             warm_start, max_iter, verbose, random_state)

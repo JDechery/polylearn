@@ -111,6 +111,7 @@ def _cd_lifted(double[:, :, ::1] U,
                LossFunction loss,
                int max_iter,
                double tol,
+               double reltol,
                int verbose):
 
     cdef Py_ssize_t n_samples = X.get_n_samples()
@@ -121,6 +122,7 @@ def _cd_lifted(double[:, :, ::1] U,
     cdef int it
 
     cdef double sum_viol
+    cdef double prev_viol = 0.
     cdef bint converged = False
 
     cdef double inv_step_size
@@ -171,7 +173,7 @@ def _cd_lifted(double[:, :, ::1] U,
         if verbose:
             print("Iteration", it + 1, "violation sum", sum_viol)
 
-        if sum_viol < tol:
+        if (sum_viol) < tol or (fabs(sum_viol-prev_viol)/sum_viol) < reltol:
             if verbose:
                 print("Converged at iteration", it + 1)
             converged = True
