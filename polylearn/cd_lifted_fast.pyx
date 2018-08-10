@@ -179,4 +179,6 @@ def _cd_lifted(double[:, :, ::1] U,
             converged = True
             break
 
+        prev_viol = sum_viol
+
     return converged, it
